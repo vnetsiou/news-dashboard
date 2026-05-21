@@ -16,7 +16,6 @@ from collector import run as collect_news
 st.markdown("""
 <style>
 div[data-testid="stButton"] button {
-    all: unset;
     display: block;
     width: 100%;
     cursor: pointer;
