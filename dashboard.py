@@ -100,18 +100,54 @@ positive = filtered[filtered["sentiment"] == "positive"].head(15)
 neutral  = filtered[filtered["sentiment"] == "neutral"].head(15)
 negative = filtered[filtered["sentiment"] == "negative"].head(15)
 
-def news_column(rows, border_color, bg_color):
+def news_column(rows, border_color, bg_color, col_id):
     cards_html = ""
-    for _, row in rows.iterrows():
+    for i, (_, row) in enumerate(rows.iterrows()):
         conf = f"{row['confidence']*100:.1f}%"
+        desc = (row.get("description") or "No description available.")
+        url  = (row.get("url") or "#")
+        modal_id = f"modal_{col_id}_{i}"
+        # Escape quotes for HTML attributes
+        desc_safe = desc.replace('"', '&quot;').replace("'", "&#39;")
+        title_safe = row['title'].replace('"', '&quot;').replace("'", "&#39;")
+
         cards_html += f"""
-            <div style="border: 1px solid {border_color}; border-radius: 10px; padding: 10px 13px;
-                        margin-bottom: 8px; background: {bg_color};">
+            <div onclick="document.getElementById('{modal_id}').style.display='flex'"
+                 style="border: 1px solid {border_color}; border-radius: 10px; padding: 10px 13px;
+                        margin-bottom: 8px; background: {bg_color}; cursor: pointer;
+                        transition: box-shadow 0.2s;"
+                 onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'"
+                 onmouseout="this.style.boxShadow='none'">
                 <div style="font-size: 13px; font-weight: 600; color: #0f172a; line-height: 1.4;
                             margin-bottom: 5px;">{row['title']}</div>
                 <div style="font-size: 11px; color: #94a3b8;">{row['source']} · {row['topic']} · {conf}</div>
             </div>
+
+            <div id="{modal_id}"
+                 onclick="if(event.target===this)this.style.display='none'"
+                 style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5);
+                        z-index:9999; align-items:center; justify-content:center;">
+                <div style="background:#fff; border-radius:16px; padding:28px; max-width:520px;
+                            width:90%; position:relative; box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+                    <button onclick="document.getElementById('{modal_id}').style.display='none'"
+                            style="position:absolute; top:14px; right:16px; background:none;
+                                   border:none; font-size:18px; cursor:pointer; color:#94a3b8;">✕</button>
+                    <div style="font-size:11px; color:{border_color}; font-weight:600;
+                                text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">
+                        {row['source']} · {row['topic']}
+                    </div>
+                    <div style="font-size:15px; font-weight:700; color:#0f172a;
+                                line-height:1.5; margin-bottom:14px;">{row['title']}</div>
+                    <div style="font-size:13px; color:#475569; line-height:1.7;
+                                margin-bottom:20px;">{desc}</div>
+                    <a href="{url}" target="_blank"
+                       style="display:inline-block; padding:8px 18px; background:{border_color};
+                              color:#fff; border-radius:20px; font-size:12px; font-weight:600;
+                              text-decoration:none;">Read full article →</a>
+                </div>
+            </div>
         """
+
     st.markdown(f"""
         <div style="height: 520px; overflow-y: auto; padding-right: 4px;">
             {cards_html}
@@ -120,12 +156,12 @@ def news_column(rows, border_color, bg_color):
 
 with col_pos:
     st.markdown("### 😊 Positive")
-    news_column(positive, "#06d6a0", "#f0fdf9")
+    news_column(positive, "#06d6a0", "#f0fdf9", "pos")
 
 with col_neu:
     st.markdown("### 😐 Neutral")
-    news_column(neutral, "#a78bfa", "#faf5ff")
+    news_column(neutral, "#a78bfa", "#faf5ff", "neu")
 
 with col_neg:
     st.markdown("### 😤 Negative")
-    news_column(negative, "#ef476f", "#fff1f3")
+    news_column(negative, "#ef476f", "#fff1f3", "neg")

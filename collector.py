@@ -1,4 +1,5 @@
 import os
+import html
 import requests
 import psycopg2
 from datetime import datetime
@@ -24,6 +25,8 @@ def init_db():
         CREATE TABLE IF NOT EXISTS articles (
             id SERIAL PRIMARY KEY,
             title TEXT NOT NULL UNIQUE,
+            description TEXT,
+            url TEXT,
             source TEXT,
             topic TEXT,
             sentiment TEXT,
@@ -31,6 +34,11 @@ def init_db():
             fetched_at TIMESTAMP
         )
     """)
+    # Add columns if they don't exist yet (for existing DBs)
+    for col, coltype in [("description", "TEXT"), ("url", "TEXT")]:
+        cur.execute(f"""
+            ALTER TABLE articles ADD COLUMN IF NOT EXISTS {col} {coltype}
+        """)
     conn.commit()
     cur.close()
     return conn
@@ -72,8 +80,10 @@ def run():
             continue
 
         for article in articles:
-            title = (article.get("title") or "").strip()
-            source = (article.get("source") or {}).get("name", "Unknown")
+            title       = html.unescape((article.get("title") or "").strip())
+            description = html.unescape((article.get("description") or "").strip())
+            url         = (article.get("url") or "").strip()
+            source      = (article.get("source") or {}).get("name", "Unknown")
 
             if not title:
                 continue
@@ -86,10 +96,10 @@ def run():
 
             try:
                 cur.execute(
-                    """INSERT INTO articles (title, source, topic, sentiment, confidence, fetched_at)
-                       VALUES (%s, %s, %s, %s, %s, %s)
+                    """INSERT INTO articles (title, description, url, source, topic, sentiment, confidence, fetched_at)
+                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                        ON CONFLICT (title) DO NOTHING""",
-                    (title, source, topic, sentiment, confidence, now),
+                    (title, description, url, source, topic, sentiment, confidence, now),
                 )
                 if cur.rowcount:
                     total += 1
