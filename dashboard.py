@@ -1,7 +1,13 @@
-import sqlite3
+import os
+import psycopg2
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+from dotenv import load_dotenv
+
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 st.set_page_config(page_title="News Sentiment Dashboard", page_icon="📰", layout="wide")
 
@@ -9,9 +15,9 @@ st.title("📰 News Sentiment Dashboard")
 st.caption("Real-time sentiment analysis of news headlines powered by a custom RoBERTa API.")
 
 
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=300)
 def load_data():
-    conn = sqlite3.connect("news.db")
+    conn = psycopg2.connect(DATABASE_URL)
     df = pd.read_sql("SELECT * FROM articles ORDER BY fetched_at DESC", conn)
     conn.close()
     return df
@@ -19,8 +25,8 @@ def load_data():
 
 try:
     df = load_data()
-except Exception:
-    st.warning("No data yet — run `collector.py` first.")
+except Exception as e:
+    st.warning(f"No data yet — run `collector.py` first. ({e})")
     st.stop()
 
 if df.empty:
@@ -54,11 +60,12 @@ k4.metric("Neutral", len(filtered[filtered["sentiment"] == "neutral"]))
 st.divider()
 c1, c2 = st.columns(2)
 
+colors = {"positive": "#00BC91", "negative": "#ef4444", "neutral": "#94a3b8"}
+
 with c1:
     st.subheader("Sentiment Distribution")
     pie = filtered["sentiment"].value_counts().reset_index()
     pie.columns = ["sentiment", "count"]
-    colors = {"positive": "#00BC91", "negative": "#ef4444", "neutral": "#94a3b8"}
     fig = px.pie(pie, names="sentiment", values="count",
                  color="sentiment", color_discrete_map=colors, hole=0.4)
     fig.update_layout(margin=dict(t=0, b=0))
@@ -72,10 +79,9 @@ with c2:
     fig2.update_layout(margin=dict(t=0, b=0))
     st.plotly_chart(fig2, use_container_width=True)
 
-# --- Top Articles ---
+# --- Headlines ---
 st.divider()
 st.subheader("Latest Headlines")
-
 for _, row in filtered.head(20).iterrows():
     emoji = {"positive": "😊", "negative": "😤", "neutral": "😐"}.get(row["sentiment"], "🔹")
     conf = f"{row['confidence']*100:.1f}%"
