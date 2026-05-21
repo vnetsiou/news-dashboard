@@ -13,6 +13,21 @@ st.set_page_config(page_title="News Sentiment Dashboard", page_icon="📰", layo
 
 from collector import run as collect_news
 
+st.markdown("""
+<style>
+div[data-testid="stButton"] button {
+    all: unset;
+    display: block;
+    width: 100%;
+    cursor: pointer;
+}
+div[data-testid="stButton"] button:focus {
+    outline: none;
+    box-shadow: none;
+}
+</style>
+""", unsafe_allow_html=True)
+
 st.title("📰 News Sentiment Dashboard")
 st.caption("Real-time sentiment analysis of news headlines powered by a custom RoBERTa API.")
 
@@ -117,17 +132,16 @@ def show_article(row, border_color):
 def news_column(rows, border_color, bg_color, col_id):
     for i, (_, row) in enumerate(rows.iterrows()):
         conf = f"{row['confidence']*100:.1f}%"
-        st.markdown(f"""
+        label = f"""
             <div style="border: 1px solid {border_color}; border-radius: 10px; padding: 10px 13px;
-                        margin-bottom: 2px; background: {bg_color};">
+                        margin-bottom: 8px; background: {bg_color}; text-align:left;">
                 <div style="font-size: 13px; font-weight: 600; color: #0f172a;
                             line-height: 1.4; margin-bottom: 4px;">{row['title']}</div>
                 <div style="font-size: 11px; color: #94a3b8;">{row['source']} · {row['topic']} · {conf}</div>
             </div>
-        """, unsafe_allow_html=True)
-        if st.button("Details", key=f"{col_id}_{i}", use_container_width=False):
+        """
+        if st.button(label, key=f"{col_id}_{i}", use_container_width=True):
             show_article(row, border_color)
-        st.markdown("<div style='margin-bottom:6px'></div>", unsafe_allow_html=True)
 
 with col_pos:
     st.markdown("### 😊 Positive")
