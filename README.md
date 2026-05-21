@@ -77,4 +77,4 @@ streamlit run dashboard.py
 ## Author
 
 **Vasiliki Netsiou** — Full Stack Developer  
-[LinkedIn](https://www.linkedin.com/in/vasiliki-netsiou) · [Portfolio](https://netsiou.dev)
+[LinkedIn](https://www.linkedin.com/in/vasiliki-netsiou) · [Portfolio](https://vasilikinetsiou.gr)
