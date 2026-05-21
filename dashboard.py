@@ -79,10 +79,33 @@ with c2:
     fig2.update_layout(margin=dict(t=0, b=0))
     st.plotly_chart(fig2, use_container_width=True)
 
-# --- Headlines ---
+# --- Headlines by Sentiment ---
 st.divider()
 st.subheader("Latest Headlines")
-for _, row in filtered.head(20).iterrows():
-    emoji = {"positive": "😊", "negative": "😤", "neutral": "😐"}.get(row["sentiment"], "🔹")
-    conf = f"{row['confidence']*100:.1f}%"
-    st.markdown(f"{emoji} **{row['title']}**  \n`{row['source']}` · `{row['topic']}` · {row['sentiment']} ({conf})")
+
+col_pos, col_neu, col_neg = st.columns(3)
+
+positive = filtered[filtered["sentiment"] == "positive"].head(15)
+neutral  = filtered[filtered["sentiment"] == "neutral"].head(15)
+negative = filtered[filtered["sentiment"] == "negative"].head(15)
+
+with col_pos:
+    st.markdown("### 😊 Positive")
+    for _, row in positive.iterrows():
+        conf = f"{row['confidence']*100:.1f}%"
+        st.markdown(f"**{row['title']}**  \n`{row['source']}` · `{row['topic']}` · {conf}")
+        st.divider()
+
+with col_neu:
+    st.markdown("### 😐 Neutral")
+    for _, row in neutral.iterrows():
+        conf = f"{row['confidence']*100:.1f}%"
+        st.markdown(f"**{row['title']}**  \n`{row['source']}` · `{row['topic']}` · {conf}")
+        st.divider()
+
+with col_neg:
+    st.markdown("### 😤 Negative")
+    for _, row in negative.iterrows():
+        conf = f"{row['confidence']*100:.1f}%"
+        st.markdown(f"**{row['title']}**  \n`{row['source']}` · `{row['topic']}` · {conf}")
+        st.divider()
