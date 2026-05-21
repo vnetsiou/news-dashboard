@@ -13,7 +13,10 @@ A real-time dashboard that fetches news headlines, analyzes their sentiment usin
 - Stores results in PostgreSQL with deduplication
 - Auto-refreshes every 6 hours via a scheduled collector
 - Interactive filters by topic and sentiment
-- Pie chart, bar chart, and headline feed with confidence scores
+- Pie chart and bar chart for sentiment distribution
+- Headlines split into 3 columns (Positive / Neutral / Negative) with confidence scores
+- Clickable cards that open a popup with article description and link
+- Manual refresh button for on-demand data collection
 
 ## Tech Stack
 
