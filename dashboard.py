@@ -11,8 +11,19 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 
 st.set_page_config(page_title="News Sentiment Dashboard", page_icon="📰", layout="wide")
 
+from collector import run as collect_news
+
 st.title("📰 News Sentiment Dashboard")
 st.caption("Real-time sentiment analysis of news headlines powered by a custom RoBERTa API.")
+
+col_title, col_btn = st.columns([4, 1])
+with col_btn:
+    if st.button("🔄 Refresh News", use_container_width=True):
+        with st.spinner("Fetching latest news..."):
+            collect_news()
+        st.cache_data.clear()
+        st.success("Done!")
+        st.rerun()
 
 
 @st.cache_data(ttl=300)
