@@ -20,10 +20,24 @@ div[data-testid="stButton"] button {
     display: block;
     width: 100%;
     cursor: pointer;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 10px 13px;
+    margin-bottom: 6px;
+    background: #ffffff;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+    color: #0f172a;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    transition: box-shadow 0.2s;
+}
+div[data-testid="stButton"] button:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 div[data-testid="stButton"] button:focus {
     outline: none;
-    box-shadow: none;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -132,14 +146,7 @@ def show_article(row, border_color):
 def news_column(rows, border_color, bg_color, col_id):
     for i, (_, row) in enumerate(rows.iterrows()):
         conf = f"{row['confidence']*100:.1f}%"
-        label = f"""
-            <div style="border: 1px solid {border_color}; border-radius: 10px; padding: 10px 13px;
-                        margin-bottom: 8px; background: {bg_color}; text-align:left;">
-                <div style="font-size: 13px; font-weight: 600; color: #0f172a;
-                            line-height: 1.4; margin-bottom: 4px;">{row['title']}</div>
-                <div style="font-size: 11px; color: #94a3b8;">{row['source']} · {row['topic']} · {conf}</div>
-            </div>
-        """
+        label = f"{row['title']}\n{row['source']} · {row['topic']} · {conf}"
         if st.button(label, key=f"{col_id}_{i}", use_container_width=True):
             show_article(row, border_color)
 
