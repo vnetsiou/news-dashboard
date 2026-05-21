@@ -4,7 +4,7 @@ A real-time dashboard that fetches news headlines, analyzes their sentiment usin
 
 ## Demo
 
-> Live demo: _coming soon_
+> **Live demo: [news-dashboard.up.railway.app](https://news-dashboard.up.railway.app)**
 
 ## Features
 
