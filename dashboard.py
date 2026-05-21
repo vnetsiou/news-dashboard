@@ -71,7 +71,7 @@ k4.metric("Neutral", len(filtered[filtered["sentiment"] == "neutral"]))
 st.divider()
 c1, c2 = st.columns(2)
 
-colors = {"positive": "#00BC91", "negative": "#ef4444", "neutral": "#94a3b8"}
+colors = {"positive": "#06d6a0", "negative": "#ef476f", "neutral": "#a78bfa"}
 
 with c1:
     st.subheader("Sentiment Distribution")
@@ -100,26 +100,32 @@ positive = filtered[filtered["sentiment"] == "positive"].head(15)
 neutral  = filtered[filtered["sentiment"] == "neutral"].head(15)
 negative = filtered[filtered["sentiment"] == "negative"].head(15)
 
-def news_card(row, border_color):
-    conf = f"{row['confidence']*100:.1f}%"
+def news_column(rows, border_color, bg_color):
+    cards_html = ""
+    for _, row in rows.iterrows():
+        conf = f"{row['confidence']*100:.1f}%"
+        cards_html += f"""
+            <div style="border: 1px solid {border_color}; border-radius: 10px; padding: 10px 13px;
+                        margin-bottom: 8px; background: {bg_color};">
+                <div style="font-size: 13px; font-weight: 600; color: #0f172a; line-height: 1.4;
+                            margin-bottom: 5px;">{row['title']}</div>
+                <div style="font-size: 11px; color: #94a3b8;">{row['source']} · {row['topic']} · {conf}</div>
+            </div>
+        """
     st.markdown(f"""
-        <div style="border: 1px solid {border_color}; border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; background: #ffffff;">
-            <div style="font-size: 14px; font-weight: 600; color: #0f172a; line-height: 1.5; margin-bottom: 8px;">{row['title']}</div>
-            <div style="font-size: 12px; color: #64748b;">{row['source']} · {row['topic']} · {conf}</div>
+        <div style="height: 520px; overflow-y: auto; padding-right: 4px;">
+            {cards_html}
         </div>
     """, unsafe_allow_html=True)
 
 with col_pos:
     st.markdown("### 😊 Positive")
-    for _, row in positive.iterrows():
-        news_card(row, "#00BC91")
+    news_column(positive, "#06d6a0", "#f0fdf9")
 
 with col_neu:
     st.markdown("### 😐 Neutral")
-    for _, row in neutral.iterrows():
-        news_card(row, "#cbd5e1")
+    news_column(neutral, "#a78bfa", "#faf5ff")
 
 with col_neg:
     st.markdown("### 😤 Negative")
-    for _, row in negative.iterrows():
-        news_card(row, "#ef4444")
+    news_column(negative, "#ef476f", "#fff1f3")
