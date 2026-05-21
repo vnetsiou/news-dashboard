@@ -100,23 +100,26 @@ positive = filtered[filtered["sentiment"] == "positive"].head(15)
 neutral  = filtered[filtered["sentiment"] == "neutral"].head(15)
 negative = filtered[filtered["sentiment"] == "negative"].head(15)
 
+def news_card(row, border_color):
+    conf = f"{row['confidence']*100:.1f}%"
+    st.markdown(f"""
+        <div style="border: 1px solid {border_color}; border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; background: #ffffff;">
+            <div style="font-size: 14px; font-weight: 600; color: #0f172a; line-height: 1.5; margin-bottom: 8px;">{row['title']}</div>
+            <div style="font-size: 12px; color: #64748b;">{row['source']} · {row['topic']} · {conf}</div>
+        </div>
+    """, unsafe_allow_html=True)
+
 with col_pos:
     st.markdown("### 😊 Positive")
     for _, row in positive.iterrows():
-        conf = f"{row['confidence']*100:.1f}%"
-        st.markdown(f"**{row['title']}**  \n`{row['source']}` · `{row['topic']}` · {conf}")
-        st.divider()
+        news_card(row, "#00BC91")
 
 with col_neu:
     st.markdown("### 😐 Neutral")
     for _, row in neutral.iterrows():
-        conf = f"{row['confidence']*100:.1f}%"
-        st.markdown(f"**{row['title']}**  \n`{row['source']}` · `{row['topic']}` · {conf}")
-        st.divider()
+        news_card(row, "#cbd5e1")
 
 with col_neg:
     st.markdown("### 😤 Negative")
     for _, row in negative.iterrows():
-        conf = f"{row['confidence']*100:.1f}%"
-        st.markdown(f"**{row['title']}**  \n`{row['source']}` · `{row['topic']}` · {conf}")
-        st.divider()
+        news_card(row, "#ef4444")
